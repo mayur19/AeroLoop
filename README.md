@@ -57,10 +57,9 @@ We welcome contributions! Whether it's bug reports, feature requests, or pull re
 2. Please adhere to the [Code of Conduct](CODE_OF_CONDUCT.md).
 
 ## ☕️ Support & Donations
-AeroLoop is free and open-source. If you enjoy the app and want to support its ongoing development, consider buying me a coffee or sponsoring the project!
+AeroLoop is free and open-source. If you enjoy the app and want to support its ongoing development, consider buying me a coffee!
 
-*   [Buy Me a Coffee](https://buymeacoffee.com/YOUR-USERNAME)
-*   [GitHub Sponsors](https://github.com/sponsors/YOUR-USERNAME)
+*   [Buy Me a Coffee](https://buymeacoffee.com/YOUR-BMC-USERNAME)
 
 ## 📄 License
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.

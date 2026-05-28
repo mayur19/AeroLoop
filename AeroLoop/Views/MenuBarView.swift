@@ -43,7 +43,7 @@ struct MenuBarView: View {
                 )
             }
             .keyboardShortcut("p", modifiers: [.command])
-            
+
             if appState.wallpaperEngine.activePlaylist != nil {
                 Button {
                     appState.wallpaperEngine.nextWallpaper()
@@ -137,7 +137,7 @@ struct MenuBarView: View {
 
         // Start security-scoped access.
         let didStart = url.startAccessingSecurityScopedResource()
-        
+
         // Create a security-scoped bookmark before losing access
         let bookmark = BookmarkManager.createBookmark(for: url)
 

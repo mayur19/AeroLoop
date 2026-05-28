@@ -30,7 +30,7 @@ class WallpaperEngine: ObservableObject {
     private var originalWallpaperURLs: [CGDirectDisplayID: URL] = [:]
     private var cancellables = Set<AnyCancellable>()
     private var screenObserver: NSObjectProtocol?
-    
+
     private var rotationTimer: Timer?
     private var playlistIndex: Int = 0
     private var shuffledIndices: [Int] = []
@@ -76,7 +76,7 @@ class WallpaperEngine: ObservableObject {
                   let window = wallpaperWindows[displayID] else { continue }
             window.updateFrame(for: screen)
         }
-        
+
         // 3. (Optional) Auto-apply wallpaper to newly connected displays
         if isPlaying {
             // Apply a default or playlist if necessary
@@ -90,16 +90,16 @@ class WallpaperEngine: ObservableObject {
         if !isFromPlaylist {
             stopPlaylistRotation()
         }
-        
+
         let settings = SettingsManager.sharedDefaults
         let muted = settings.bool(forKey: "aeroloop.audioMuted")
         let syncAllDisplays = settings.bool(forKey: "aeroloop.syncAllDisplays")
-        
+
         let targetScreens = NSScreen.screens.filter { screen in
             guard let id = screen.displayID else { return false }
             return displayID == nil || syncAllDisplays || id == displayID
         }
-        
+
         for screen in targetScreens {
             guard let id = screen.displayID else { continue }
 
@@ -110,13 +110,13 @@ class WallpaperEngine: ObservableObject {
 
             // Reuse existing window or create a new one
             let window = wallpaperWindows[id] ?? WallpaperWindow(screen: screen)
-            
+
             window.setVideo(
                 url: item.url,
                 displayMode: item.displayMode,
                 muted: muted
             )
-            
+
             if activePauseReasons.isEmpty {
                 window.play()
             } else {
@@ -129,7 +129,7 @@ class WallpaperEngine: ObservableObject {
 
         isPlaying = activePauseReasons.isEmpty
     }
-    
+
     /// Updates the settings of all active windows on the fly
     func updateSettings(muted: Bool, displayMode: DisplayMode, qualityMode: QualityMode) {
         for window in wallpaperWindows.values {
@@ -140,23 +140,23 @@ class WallpaperEngine: ObservableObject {
     }
 
     // MARK: - Playlists
-    
+
     func applyPlaylist(_ playlist: PlaylistWithItems) {
         guard !playlist.items.isEmpty else { return }
-        
+
         activePlaylist = playlist
         playlistIndex = 0
-        
+
         if playlist.playlist.shuffle {
             shuffledIndices = Array(0..<playlist.items.count).shuffled()
         } else {
             shuffledIndices = Array(0..<playlist.items.count)
         }
-        
+
         applyWallpaper(playlist.items[shuffledIndices[0]], isFromPlaylist: true)
         startPlaylistRotation(interval: playlist.playlist.rotationInterval)
     }
-    
+
     private func startPlaylistRotation(interval: TimeInterval) {
         rotationTimer?.invalidate()
         rotationTimer = Timer.scheduledTimer(withTimeInterval: interval, repeats: true) { [weak self] _ in
@@ -165,30 +165,30 @@ class WallpaperEngine: ObservableObject {
             }
         }
     }
-    
+
     private func stopPlaylistRotation() {
         rotationTimer?.invalidate()
         rotationTimer = nil
         activePlaylist = nil
         shuffledIndices.removeAll()
     }
-    
+
     func nextWallpaper() {
         guard let playlist = activePlaylist, !playlist.items.isEmpty else { return }
-        
+
         playlistIndex = (playlistIndex + 1) % playlist.items.count
-        
+
         // Reshuffle if we hit the end of a shuffled playlist
         if playlistIndex == 0 && playlist.playlist.shuffle {
             shuffledIndices = Array(0..<playlist.items.count).shuffled()
         }
-        
+
         let nextItem = playlist.items[shuffledIndices[playlistIndex]]
         applyWallpaper(nextItem, isFromPlaylist: true)
     }
 
     // MARK: - Playback Controls
-    
+
     enum PauseReason: Hashable {
         case manual
         case battery
@@ -208,7 +208,7 @@ class WallpaperEngine: ObservableObject {
         activePauseReasons.remove(reason)
         updatePlaybackState()
     }
-    
+
     private func updatePlaybackState() {
         if activePauseReasons.isEmpty {
             for window in wallpaperWindows.values {

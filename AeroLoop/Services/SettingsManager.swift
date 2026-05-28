@@ -23,12 +23,12 @@ class SettingsManager: ObservableObject {
     @AppStorage("aeroloop.hasCompletedOnboarding", store: sharedDefaults) var hasCompletedOnboarding: Bool = false
     @AppStorage("aeroloop.syncAllDisplays", store: sharedDefaults) var syncAllDisplays: Bool = true
     @AppStorage("aeroloop.lastWallpaperData", store: sharedDefaults) var lastWallpaperData: Data = Data()
-    
+
     // Smart Schedules
     @AppStorage("aeroloop.dayPlaylistId", store: sharedDefaults) var dayPlaylistId: String?
     @AppStorage("aeroloop.nightPlaylistId", store: sharedDefaults) var nightPlaylistId: String?
     @AppStorage("aeroloop.batteryPlaylistId", store: sharedDefaults) var batteryPlaylistId: String?
-    
+
     // UI Overlays
     @AppStorage("aeroloop.showClockOverlay", store: sharedDefaults) var showClockOverlay: Bool = false
 
@@ -56,7 +56,7 @@ class SettingsManager: ObservableObject {
             lastWallpaperData = (try? JSONEncoder().encode(newValue)) ?? Data()
         }
     }
-    
+
     // For backwards compatibility and the primary display, we can expose a current/last item
     var lastWallpaper: WallpaperItem? {
         lastWallpapers.values.first
@@ -85,35 +85,35 @@ class SettingsManager: ObservableObject {
     /// so the heavily sandboxed macOS Screen Saver process can reliably read it.
     func saveLastWallpaper(_ item: WallpaperItem, for displayID: CGDirectDisplayID? = nil) {
         var itemToSave = item
-        
+
         let fm = FileManager.default
         let containerURL = SharedPaths.containerURL
-        
+
         do {
             try SharedPaths.ensureDirectoryExists(at: containerURL)
-            
+
             let destURL = SharedPaths.wallpaperDestination(for: item.url, displayID: displayID)
-            
+
             if fm.fileExists(atPath: destURL.path) && destURL != item.url {
                 try fm.removeItem(at: destURL)
             }
-            
+
             // Copy the file to the shared directory if it's not already there
             if destURL != item.url {
                 try fm.copyItem(at: item.url, to: destURL)
             }
-            
+
             // Update the URL to point to the shared file so the Screen Saver can read it
             itemToSave.url = destURL
-            
+
             // Write the JSON representation so the Screen Saver can read it directly
             let jsonData = try JSONEncoder().encode(itemToSave)
             try jsonData.write(to: SharedPaths.settingsURL, options: .atomic)
-            
+
         } catch {
             print("[SettingsManager] Failed to copy wallpaper to App Group container: \(error.localizedDescription)")
         }
-        
+
         var currentWallpapers = lastWallpapers
         if let displayID = displayID, !syncAllDisplays {
             currentWallpapers[String(displayID)] = itemToSave
@@ -132,13 +132,13 @@ class SettingsManager: ObservableObject {
     func clearLastWallpaper() {
         lastWallpaperData = Data()
     }
-    
+
     // MARK: - Playlist Persistence
-    
+
     func saveActivePlaylist(id: String) {
         activePlaylistId = id
     }
-    
+
     func clearActivePlaylist() {
         activePlaylistId = nil
         try? FileManager.default.removeItem(at: SharedPaths.activePlaylistURL)

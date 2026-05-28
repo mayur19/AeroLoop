@@ -8,7 +8,7 @@ struct Playlist: Identifiable, Codable, Equatable, Hashable {
     var rotationInterval: TimeInterval // e.g. 300 for 5 minutes
     var shuffle: Bool
     var dateCreated: Date
-    
+
     init(
         id: UUID = UUID(),
         title: String,
@@ -32,7 +32,7 @@ extension Playlist: FetchableRecord, MutablePersistableRecord {
         static let shuffle = Column("shuffle")
         static let dateCreated = Column("dateCreated")
     }
-    
+
     init(row: Row) throws {
         let idString: String = row[Columns.id]
         id = UUID(uuidString: idString) ?? UUID()
@@ -41,7 +41,7 @@ extension Playlist: FetchableRecord, MutablePersistableRecord {
         shuffle = row[Columns.shuffle]
         dateCreated = row[Columns.dateCreated]
     }
-    
+
     func encode(to container: inout PersistenceContainer) throws {
         container[Columns.id] = id.uuidString
         container[Columns.title] = title
@@ -64,7 +64,7 @@ extension PlaylistMembership: FetchableRecord, MutablePersistableRecord {
         static let wallpaperId = Column("wallpaperId")
         static let position = Column("position")
     }
-    
+
     init(row: Row) throws {
         let pIdString: String = row[Columns.playlistId]
         let wIdString: String = row[Columns.wallpaperId]
@@ -72,7 +72,7 @@ extension PlaylistMembership: FetchableRecord, MutablePersistableRecord {
         wallpaperId = UUID(uuidString: wIdString) ?? UUID()
         position = row[Columns.position]
     }
-    
+
     func encode(to container: inout PersistenceContainer) throws {
         container[Columns.playlistId] = playlistId.uuidString
         container[Columns.wallpaperId] = wallpaperId.uuidString

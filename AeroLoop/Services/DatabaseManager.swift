@@ -24,14 +24,14 @@ final class DatabaseManager {
         }
 
         let dbURL = aeroLoopDir.appendingPathComponent("library.sqlite")
-        
+
         var config = Configuration()
         #if DEBUG
         config.prepareDatabase { db in
             db.trace { print("[GRDB] \($0)") }
         }
         #endif
-        
+
         dbPool = try DatabasePool(path: dbURL.path, configuration: config)
 
         try migrator.migrate(dbPool)
@@ -54,7 +54,7 @@ final class DatabaseManager {
                 t.column("dateAdded", .datetime).notNull()
             }
         }
-        
+
         migrator.registerMigration("v2") { db in
             try db.create(table: "playlist") { t in
                 t.column("id", .text).primaryKey()
@@ -63,7 +63,7 @@ final class DatabaseManager {
                 t.column("shuffle", .boolean).notNull().defaults(to: false)
                 t.column("dateCreated", .datetime).notNull()
             }
-            
+
             try db.create(table: "playlistMembership") { t in
                 t.column("playlistId", .text).notNull().references("playlist", onDelete: .cascade)
                 t.column("wallpaperId", .text).notNull().references("wallpaperItem", onDelete: .cascade)

@@ -60,3 +60,26 @@ targets:
         MARKETING_VERSION: 1.0.0
         CURRENT_PROJECT_VERSION: 1
         DEVELOPMENT_TEAM: 5WDQX4W4GB
+
+  AeroLoopTests:
+    type: bundle.unit-test
+    platform: macOS
+    deploymentTarget: "13.0"
+    sources: [AeroLoopTests]
+    dependencies:
+      - target: AeroLoop
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.greekerlabs.aeroloop.tests
+        SWIFT_VERSION: "5.9"
+        GENERATE_INFOPLIST_FILE: YES
+        CODE_SIGN_STYLE: Automatic
+schemes:
+  AeroLoop:
+    build:
+      targets:
+        AeroLoop: all
+    test:
+      targets:
+        - AeroLoopTests
+      gatherCoverageData: true

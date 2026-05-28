@@ -1,0 +1,5 @@
+# Code owners for AeroLoop.
+# The owner is automatically requested for review on every pull request,
+# and branch protection requires their approval before merging to main.
+
+*       @mayur19

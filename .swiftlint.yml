@@ -1,0 +1,56 @@
+# SwiftLint configuration for AeroLoop
+# Docs: https://github.com/realm/SwiftLint
+
+included:
+  - AeroLoop
+  - AeroLoopSaver
+  - AeroLoopTests
+
+excluded:
+  - AeroLoop.xcodeproj
+  - .build
+  - DerivedData
+
+# Opt-in rules that improve quality without being noisy.
+opt_in_rules:
+  - empty_count
+  - closure_spacing
+  - explicit_init
+  - first_where
+  - redundant_nil_coalescing
+  - toggle_bool
+  - unneeded_parentheses_in_closure_argument
+
+# Keep these as warnings (non-fatal) so day-to-day work isn't blocked,
+# while still surfacing them in CI logs.
+line_length:
+  warning: 140
+  error: 250
+  ignores_comments: true
+  ignores_urls: true
+
+type_body_length:
+  warning: 400
+  error: 600
+
+file_length:
+  warning: 600
+  error: 1000
+
+function_body_length:
+  warning: 80
+  error: 150
+
+identifier_name:
+  min_length:
+    warning: 2
+    error: 1
+  excluded:
+    - id
+    - to
+    - a
+    - b
+
+# Tests intentionally use long, descriptive function names.
+disabled_rules:
+  - todo

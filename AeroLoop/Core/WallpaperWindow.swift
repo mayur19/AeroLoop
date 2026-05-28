@@ -36,10 +36,10 @@ class WallpaperWindow: NSWindow {
         let overlayHostingView = NSHostingView(rootView: OverlayView(settings: AppState.shared.settings))
         overlayHostingView.frame = playerView.bounds
         overlayHostingView.autoresizingMask = [.width, .height]
-        
+
         // Ensure NSHostingView has a transparent background
         overlayHostingView.layer?.backgroundColor = NSColor.clear.cgColor
-        
+
         playerView.addSubview(overlayHostingView)
         contentView = playerView
         orderFront(nil)

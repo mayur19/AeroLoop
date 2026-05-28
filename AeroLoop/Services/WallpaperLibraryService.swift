@@ -15,7 +15,7 @@ extension WallpaperItem: FetchableRecord, MutablePersistableRecord {
         static let dateAdded = Column("dateAdded")
         static let bookmarkData = Column("bookmarkData")
     }
-    
+
     init(row: Row) throws {
         let idString: String = row[Columns.id]
         id = UUID(uuidString: idString) ?? UUID()
@@ -33,7 +33,7 @@ extension WallpaperItem: FetchableRecord, MutablePersistableRecord {
         dateAdded = row[Columns.dateAdded]
         bookmarkData = row[Columns.bookmarkData]
     }
-    
+
     func encode(to container: inout PersistenceContainer) throws {
         container[Columns.id] = id.uuidString
         container[Columns.url] = url.path
@@ -53,15 +53,15 @@ extension WallpaperItem: FetchableRecord, MutablePersistableRecord {
 @MainActor
 class WallpaperLibraryService: ObservableObject {
     @Published var items: [WallpaperItem] = []
-    
+
     private let dbManager = DatabaseManager.shared
-    
+
     init() {
         Task {
             await fetchAll()
         }
     }
-    
+
     func fetchAll() async {
         do {
             let fetchedItems = try await dbManager.dbPool.read { db in
@@ -72,7 +72,7 @@ class WallpaperLibraryService: ObservableObject {
             print("[LibraryService] Failed to fetch items: \(error)")
         }
     }
-    
+
     func add(_ item: WallpaperItem) async {
         do {
             try await dbManager.dbPool.write { db in
@@ -84,7 +84,7 @@ class WallpaperLibraryService: ObservableObject {
             print("[LibraryService] Failed to add item: \(error)")
         }
     }
-    
+
     func update(_ item: WallpaperItem) async {
         do {
             try await dbManager.dbPool.write { db in
@@ -96,7 +96,7 @@ class WallpaperLibraryService: ObservableObject {
             print("[LibraryService] Failed to update item: \(error)")
         }
     }
-    
+
     func delete(_ item: WallpaperItem) async {
         do {
             try await dbManager.dbPool.write { db in

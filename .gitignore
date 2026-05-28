@@ -54,3 +54,6 @@ Carthage/Build/
 
 # XcodeGen
 AeroLoop.xcodeproj/
+
+# JetBrains IDEs
+.idea/

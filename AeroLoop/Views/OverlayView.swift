@@ -3,16 +3,16 @@ import Combine
 
 struct OverlayView: View {
     @ObservedObject var settings: SettingsManager
-    
+
     @State private var currentTime = Date()
     let timer = Timer.publish(every: 1.0, on: .main, in: .common).autoconnect()
-    
+
     var timeFormatter: DateFormatter {
         let formatter = DateFormatter()
         formatter.timeStyle = .short
         return formatter
     }
-    
+
     var body: some View {
         ZStack {
             if settings.showClockOverlay {

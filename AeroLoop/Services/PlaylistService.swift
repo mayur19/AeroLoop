@@ -4,15 +4,15 @@ import GRDB
 @MainActor
 class PlaylistService: ObservableObject {
     @Published var playlists: [PlaylistWithItems] = []
-    
+
     private let dbManager = DatabaseManager.shared
-    
+
     init() {
         Task {
             await fetchAll()
         }
     }
-    
+
     func fetchAll() async {
         do {
             let fetchedPlaylists = try await dbManager.dbPool.read { db in
@@ -24,7 +24,7 @@ class PlaylistService: ObservableObject {
             print("[PlaylistService] Failed to fetch playlists: \(error)")
         }
     }
-    
+
     func createPlaylist(title: String, rotationInterval: TimeInterval = 300, shuffle: Bool = false) async -> Playlist {
         let playlist = Playlist(title: title, rotationInterval: rotationInterval, shuffle: shuffle)
         do {
@@ -38,7 +38,7 @@ class PlaylistService: ObservableObject {
         }
         return playlist
     }
-    
+
     func deletePlaylist(_ playlist: Playlist) async {
         do {
             try await dbManager.dbPool.write { db in
@@ -49,7 +49,7 @@ class PlaylistService: ObservableObject {
             print("[PlaylistService] Failed to delete playlist: \(error)")
         }
     }
-    
+
     func updatePlaylist(_ playlist: Playlist) async {
         do {
             try await dbManager.dbPool.write { db in
@@ -61,7 +61,7 @@ class PlaylistService: ObservableObject {
             print("[PlaylistService] Failed to update playlist: \(error)")
         }
     }
-    
+
     func addWallpaper(_ wallpaper: WallpaperItem, to playlist: Playlist) async {
         do {
             try await dbManager.dbPool.write { db in
@@ -69,7 +69,7 @@ class PlaylistService: ObservableObject {
                 let maxPos = try PlaylistMembership.filter(PlaylistMembership.Columns.playlistId == playlist.id.uuidString)
                     .select(max(PlaylistMembership.Columns.position))
                     .fetchOne(db) as Int? ?? -1
-                
+
                 var membership = PlaylistMembership(
                     playlistId: playlist.id,
                     wallpaperId: wallpaper.id,
@@ -82,7 +82,7 @@ class PlaylistService: ObservableObject {
             print("[PlaylistService] Failed to add wallpaper to playlist: \(error)")
         }
     }
-    
+
     func removeWallpaper(_ wallpaper: WallpaperItem, from playlist: Playlist) async {
         do {
             try await dbManager.dbPool.write { db in

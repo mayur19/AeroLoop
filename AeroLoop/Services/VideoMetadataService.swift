@@ -12,16 +12,16 @@ struct VideoMetadataService {
     static func importVideoToLibrary(url: URL) async throws -> URL {
         let fm = FileManager.default
         let libraryURL = SharedPaths.libraryURL
-        
+
         try SharedPaths.ensureDirectoryExists(at: libraryURL)
-        
+
         let destURL = libraryURL.appendingPathComponent(url.lastPathComponent)
-        
+
         // If the file already exists in our library, just return it.
         if fm.fileExists(atPath: destURL.path) {
             return destURL
         }
-        
+
         try fm.copyItem(at: url, to: destURL)
         return destURL
     }
@@ -66,18 +66,18 @@ struct VideoMetadataService {
     ) async -> NSImage? {
         let fm = FileManager.default
         let cacheDir = SharedPaths.thumbnailsURL
-        
+
         try? SharedPaths.ensureDirectoryExists(at: cacheDir)
-        
+
         let cacheFile = cacheDir.appendingPathComponent("\(url.deletingPathExtension().lastPathComponent).jpg")
-        
+
         // 1. Check cache
         if fm.fileExists(atPath: cacheFile.path) {
             if let img = NSImage(contentsOf: cacheFile) {
                 return img
             }
         }
-        
+
         // 2. Generate
         let asset = AVAsset(url: url)
         let generator = AVAssetImageGenerator(asset: asset)
@@ -90,13 +90,13 @@ struct VideoMetadataService {
                 cgImage: cgImage,
                 size: NSSize(width: cgImage.width, height: cgImage.height)
             )
-            
+
             // 3. Save to cache
             let bitmapRep = NSBitmapImageRep(cgImage: cgImage)
             if let jpegData = bitmapRep.representation(using: .jpeg, properties: [:]) {
                 try? jpegData.write(to: cacheFile)
             }
-            
+
             return nsImage
         } catch {
             print("[VideoMetadataService] Thumbnail generation failed: \(error.localizedDescription)")

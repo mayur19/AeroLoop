@@ -15,7 +15,7 @@ struct AeroLoopApp: App {
 
     @StateObject private var appState = AppState.shared
     @Environment(\.openWindow) private var openWindow
-    
+
     init() {}
 
     var body: some Scene {
@@ -72,9 +72,9 @@ struct AeroLoopApp: App {
         .windowStyle(.hiddenTitleBar)
         .windowResizability(.contentSize)
         .defaultSize(width: 520, height: 600)
-        
+
         // MARK: - Library Window
-        
+
         Window("AeroLoop Library", id: "library") {
             LibraryView()
                 .environmentObject(appState)

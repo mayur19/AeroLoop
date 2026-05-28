@@ -5,28 +5,28 @@ struct LibraryView: View {
     @EnvironmentObject var appState: AppState
     @EnvironmentObject var library: WallpaperLibraryService
     @EnvironmentObject var playlistsService: PlaylistService
-    
+
     @State private var isFilePickerPresented = false
     @State private var searchText = ""
     @State private var selection: SidebarItem? = .library
-    
+
     enum SidebarItem: Hashable {
         case library
         case favorites
         case playlist(UUID)
     }
-    
+
     enum SortOption: String, CaseIterable {
         case dateAdded = "Date Added"
         case title = "Title"
         case duration = "Duration"
     }
-    
+
     @State private var sortOption: SortOption = .dateAdded
-    
+
     var filteredItems: [WallpaperItem] {
         var itemsToFilter: [WallpaperItem]
-        
+
         switch selection {
         case .playlist(let id):
             if let playlist = playlistsService.playlists.first(where: { $0.playlist.id == id }) {
@@ -39,11 +39,11 @@ struct LibraryView: View {
         case .library, .none:
             itemsToFilter = library.items
         }
-        
+
         if !searchText.isEmpty {
             itemsToFilter = itemsToFilter.filter { $0.title.localizedCaseInsensitiveContains(searchText) }
         }
-        
+
         switch sortOption {
         case .dateAdded:
             return itemsToFilter.sorted { $0.dateAdded > $1.dateAdded }
@@ -53,11 +53,11 @@ struct LibraryView: View {
             return itemsToFilter.sorted { $0.duration > $1.duration }
         }
     }
-    
+
     let columns = [
         GridItem(.adaptive(minimum: 200, maximum: 240), spacing: 16)
     ]
-    
+
     var body: some View {
         NavigationSplitView {
             List(selection: $selection) {
@@ -68,7 +68,7 @@ struct LibraryView: View {
                         .tag(SidebarItem.favorites)
                         .foregroundStyle(selection == .favorites ? .white : .yellow)
                 }
-                
+
                 Section("Playlists") {
                     ForEach(playlistsService.playlists, id: \.playlist.id) { pw in
                         Label(pw.playlist.title, systemImage: "list.and.film")
@@ -83,7 +83,7 @@ struct LibraryView: View {
                                 }
                             }
                     }
-                    
+
                     Button {
                         Task { await playlistsService.createPlaylist(title: "New Playlist") }
                     } label: {
@@ -99,7 +99,7 @@ struct LibraryView: View {
                 // Glass backdrop
                 VisualEffectView(material: .underWindowBackground, blendingMode: .behindWindow)
                     .ignoresSafeArea()
-                
+
                 VStack(spacing: 0) {
                     // MARK: - Glass Toolbar
                     HStack {
@@ -115,14 +115,14 @@ struct LibraryView: View {
                             .font(.system(.title2, design: .rounded).weight(.semibold))
                             .textFieldStyle(.plain)
                             .frame(maxWidth: 250)
-                            
+
                             Button {
                                 appState.wallpaperEngine.applyPlaylist(pw)
                             } label: {
                                 Label("Play", systemImage: "play.fill")
                             }
                             .padding(.leading, 8)
-                            
+
                             Menu {
                                 Toggle("Shuffle", isOn: Binding(
                                     get: { pw.playlist.shuffle },
@@ -132,7 +132,7 @@ struct LibraryView: View {
                                         Task { await playlistsService.updatePlaylist(updated) }
                                     }
                                 ))
-                                
+
                                 Menu("Rotation Interval") {
                                     ForEach([60.0, 300.0, 900.0, 1800.0, 3600.0, 43200.0, 86400.0], id: \.self) { interval in
                                         Button(formatInterval(interval)) {
@@ -147,7 +147,7 @@ struct LibraryView: View {
                             }
                             .menuIndicator(.hidden)
                             .fixedSize()
-                            
+
                         } else if selection == .favorites {
                             Text("Favorites")
                                 .font(.system(.title2, design: .rounded))
@@ -157,9 +157,9 @@ struct LibraryView: View {
                                 .font(.system(.title2, design: .rounded))
                                 .fontWeight(.semibold)
                         }
-                        
+
                         Spacer()
-                        
+
                         HStack(spacing: 12) {
                             Picker("Sort By", selection: $sortOption) {
                                 ForEach(SortOption.allCases, id: \.self) { option in
@@ -168,7 +168,7 @@ struct LibraryView: View {
                             }
                             .pickerStyle(.menu)
                             .frame(width: 120)
-                            
+
                             HStack(spacing: 8) {
                                 Image(systemName: "magnifyingglass")
                                     .foregroundStyle(.secondary)
@@ -180,7 +180,7 @@ struct LibraryView: View {
                             .background(Capsule().fill(Color.white.opacity(0.1)))
                             .overlay(Capsule().stroke(Color.white.opacity(0.2), lineWidth: 1))
                             .frame(width: 160)
-                            
+
                             Button {
                                 isFilePickerPresented = true
                             } label: {
@@ -202,7 +202,7 @@ struct LibraryView: View {
                             .background(VisualEffectView(material: .hudWindow, blendingMode: .withinWindow))
                             .shadow(color: .black.opacity(0.2), radius: 10, x: 0, y: 5)
                     )
-                    
+
                     // MARK: - Grid
                     ScrollView {
                         if filteredItems.isEmpty {
@@ -271,15 +271,15 @@ struct LibraryView: View {
             )
         }
     }
-    
+
     private func handleFileImport(_ result: Result<[URL], Error>) {
         guard case .success(let urls) = result else { return }
         for url in urls {
             let didStart = url.startAccessingSecurityScopedResource()
-            
+
             // Create a security-scoped bookmark before losing access
             let bookmark = BookmarkManager.createBookmark(for: url)
-            
+
             Task {
                 do {
                     let durableURL = try await VideoMetadataService.importVideoToLibrary(url: url)
@@ -295,7 +295,7 @@ struct LibraryView: View {
             }
         }
     }
-    
+
     private func formatInterval(_ interval: TimeInterval) -> String {
         let formatter = DateComponentsFormatter()
         formatter.allowedUnits = interval >= 3600 ? [.hour, .minute] : [.minute]
@@ -309,18 +309,18 @@ struct LibraryView: View {
 struct LibraryItemView: View {
     let item: WallpaperItem
     let selection: LibraryView.SidebarItem?
-    
+
     @EnvironmentObject var appState: AppState
     @EnvironmentObject var library: WallpaperLibraryService
     @EnvironmentObject var playlistsService: PlaylistService
-    
+
     @State private var thumbnail: NSImage?
     @State private var isHovered = false
-    
+
     var isActive: Bool {
         appState.currentWallpaper?.id == item.id
     }
-    
+
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             // Thumbnail Area
@@ -328,7 +328,7 @@ struct LibraryItemView: View {
                 RoundedRectangle(cornerRadius: 12)
                     .fill(Color(nsColor: .windowBackgroundColor))
                     .aspectRatio(16/9, contentMode: .fit)
-                
+
                 if let thumbnail {
                     Image(nsImage: thumbnail)
                         .resizable()
@@ -337,7 +337,7 @@ struct LibraryItemView: View {
                 } else {
                     ProgressView()
                 }
-                
+
                 // Glossy glass sheer gradient
                 RoundedRectangle(cornerRadius: 12)
                     .fill(
@@ -350,7 +350,7 @@ struct LibraryItemView: View {
                             endPoint: .bottomTrailing
                         )
                     )
-                
+
                 // Play overlay if active
                 if isActive {
                     RoundedRectangle(cornerRadius: 12)
@@ -376,7 +376,7 @@ struct LibraryItemView: View {
             .onTapGesture {
                 appState.applyWallpaper(item)
             }
-            
+
             // Info Area
             HStack {
                 VStack(alignment: .leading, spacing: 4) {
@@ -426,7 +426,7 @@ struct LibraryItemView: View {
                 }
             }
             Divider()
-            
+
             Menu("Add to Playlist") {
                 ForEach(playlistsService.playlists, id: \.playlist.id) { pw in
                     Button(pw.playlist.title) {
@@ -434,13 +434,13 @@ struct LibraryItemView: View {
                     }
                 }
             }
-            
+
             if case .playlist(let id) = selection, let playlist = playlistsService.playlists.first(where: { $0.playlist.id == id }) {
                 Button("Remove from Playlist", role: .destructive) {
                     Task { await playlistsService.removeWallpaper(item, from: playlist.playlist) }
                 }
             }
-            
+
             Divider()
             Button("Toggle Favorite") {
                 var updated = item
@@ -459,7 +459,7 @@ struct LibraryItemView: View {
             loadThumbnail()
         }
     }
-    
+
     private func loadThumbnail() {
         Task {
             if let image = await VideoMetadataService.generateThumbnail(from: item.url) {

@@ -8,7 +8,7 @@ enum SettingsTab: String, CaseIterable, Identifiable {
     case battery = "Battery"
     case privacy = "Privacy"
     var id: String { rawValue }
-    
+
     var icon: String {
         switch self {
         case .general: return "gear"
@@ -50,7 +50,7 @@ struct SettingsView: View {
                                     RoundedRectangle(cornerRadius: 12)
                                         .fill(Color.white.opacity(0.1))
                                         .matchedGeometryEffect(id: "TabBackground", in: animationNamespace)
-                                    
+
                                     RoundedRectangle(cornerRadius: 12)
                                         .strokeBorder(Color.white.opacity(0.2), lineWidth: 1)
                                 }
@@ -63,7 +63,7 @@ struct SettingsView: View {
             }
             .padding(.top, 24)
             .padding(.bottom, 16)
-            
+
             Divider().opacity(0.5)
 
             // Content Area
@@ -88,7 +88,7 @@ struct SettingsView: View {
         // Extend into title bar area
         .ignoresSafeArea(.all, edges: .top)
     }
-    
+
     @Namespace private var animationNamespace
 }
 
@@ -106,7 +106,7 @@ private struct SchedulesTab: View {
                         Text("Automatically switch playlists based on your Mac's Light or Dark mode appearance.")
                             .font(.caption)
                             .foregroundStyle(.secondary)
-                            
+
                         HStack {
                             Text("Day Playlist:")
                                 .frame(width: 100, alignment: .trailing)
@@ -121,7 +121,7 @@ private struct SchedulesTab: View {
                             }
                             .labelsHidden()
                         }
-                        
+
                         HStack {
                             Text("Night Playlist:")
                                 .frame(width: 100, alignment: .trailing)
@@ -145,7 +145,7 @@ private struct SchedulesTab: View {
                         Text("Switch to a specific playlist (like low-framerate videos or static loops) when unplugged.")
                             .font(.caption)
                             .foregroundStyle(.secondary)
-                            
+
                         HStack {
                             Text("Battery Playlist:")
                                 .frame(width: 100, alignment: .trailing)
@@ -190,11 +190,11 @@ private struct GeneralTab: View {
                     }
                     .padding(4)
                 }
-                
+
                 GroupBox("Overlays") {
                     VStack(alignment: .leading, spacing: 8) {
                         Toggle("Show Clock on Desktop", isOn: $settings.showClockOverlay)
-                        
+
                         Text("Displays a minimal clock over your wallpaper.")
                             .font(.caption)
                             .foregroundStyle(.secondary)
@@ -211,7 +211,7 @@ private struct GeneralTab: View {
                                 NSApp.setActivationPolicy(newValue ? .regular : .accessory)
                             }
                         ))
-                        
+
                         Text("When disabled, AeroLoop only appears in the menu bar.")
                             .font(.caption)
                             .foregroundStyle(.secondary)
@@ -239,13 +239,13 @@ private struct GeneralTab: View {
                     }
                     .padding(4)
                 }
-                
+
                 GroupBox("Screen Saver") {
                     VStack(alignment: .leading, spacing: 8) {
                         Text("Install the AeroLoop Screen Saver to play your active wallpaper when your Mac is idle.")
                             .font(.caption)
                             .foregroundStyle(.secondary)
-                        
+
                         Button("Install Screen Saver...") {
                             installScreenSaver()
                         }
@@ -256,17 +256,17 @@ private struct GeneralTab: View {
             .padding()
         }
     }
-    
+
     private func installScreenSaver() {
         guard let plugInsURL = Bundle.main.builtInPlugInsURL else { return }
         let saverURL = plugInsURL.appendingPathComponent("AeroLoopSaver.saver")
         let fm = FileManager.default
-        
+
         guard fm.fileExists(atPath: saverURL.path) else {
             print("Screen saver not found in bundle at \(saverURL.path)")
             return
         }
-        
+
         // Open the .saver file, which prompts macOS to install it via System Preferences
         NSWorkspace.shared.open(saverURL)
     }
@@ -286,13 +286,13 @@ private struct PlaybackTab: View {
                             get: { settings.syncAllDisplays },
                             set: { settings.syncAllDisplays = $0 }
                         ))
-                        
+
                         Text("Apply the same wallpaper to every connected monitor.")
                             .font(.caption)
                             .foregroundStyle(.secondary)
-                            
+
                         Divider()
-                        
+
                         Picker("Default Display Mode", selection: Binding(
                             get: { settings.displayMode },
                             set: { settings.displayMode = $0 }

@@ -3,6 +3,7 @@
   <h1>AeroLoop</h1>
   <p><b>Beautiful, dynamic video wallpapers and screensavers for macOS.</b></p>
   
+  [![CI](https://github.com/mayur19/AeroLoop/actions/workflows/ci.yml/badge.svg)](https://github.com/mayur19/AeroLoop/actions/workflows/ci.yml)
   [![macOS 13.0+](https://img.shields.io/badge/macOS-13.0%2B-blue.svg)](https://apple.com/macos)
   [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](https://opensource.org/licenses/MIT)
   [![Swift 5.9](https://img.shields.io/badge/Swift-5.9-orange.svg)](https://swift.org)
@@ -32,7 +33,7 @@ If you prefer to build it yourself, you'll need Xcode 15+ and macOS 13.0+.
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/YOUR-USERNAME/AeroLoop.git
+   git clone https://github.com/mayur19/AeroLoop.git
    cd AeroLoop
    ```
 2. Generate the Xcode project using [XcodeGen](https://github.com/yonaskolb/XcodeGen):
@@ -50,6 +51,15 @@ AeroLoop uses a modern, local-first Swift architecture.
 *   **Cross-Process Sharing**: The main app and the Screen Saver plugin share data securely through a macOS App Group container (`group.com.greekerlabs.aeroloop`).
 
 For a deep dive into how the app works, see [ARCHITECTURE.md](ARCHITECTURE.md).
+
+### Running Tests
+Unit tests live in `AeroLoopTests/` and run via the `AeroLoop` scheme:
+```bash
+xcodegen generate
+xcodebuild test -project AeroLoop.xcodeproj -scheme AeroLoop \
+  -destination 'platform=macOS' CODE_SIGNING_ALLOWED=NO
+```
+The same suite, plus [SwiftLint](https://github.com/realm/SwiftLint), runs on every pull request via GitHub Actions. PRs to `main` require a passing CI run and a maintainer review before they can be merged.
 
 ## 🤝 Contributing
 We welcome contributions! Whether it's bug reports, feature requests, or pull requests. 

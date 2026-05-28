@@ -9,7 +9,7 @@ import SwiftUI
 final class AppState: ObservableObject {
 
     // MARK: - Sub-managers
-    
+
     static let shared = AppState()
 
     let wallpaperEngine = WallpaperEngine()
@@ -24,7 +24,7 @@ final class AppState: ObservableObject {
 
     @Published var isPlaying: Bool = false
     @Published var currentWallpaper: WallpaperItem?
-    
+
     // MARK: - Error State
     struct AppError: Identifiable {
         let id = UUID()
@@ -54,7 +54,7 @@ final class AppState: ObservableObject {
         // Start monitors
         batteryMonitor.startMonitoring()
         fullscreenDetector.startMonitoring()
-        
+
         // Start schedules after a short delay to let GRDB load
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
             self.scheduleManager.startMonitoring()
@@ -66,16 +66,16 @@ final class AppState: ObservableObject {
             .receive(on: RunLoop.main)
             .sink { [weak self] onBattery, inFullscreen in
                 guard let self else { return }
-                
+
                 let shouldPauseForBattery = onBattery && self.settings.pauseOnBattery
                 let shouldPauseForFullscreen = inFullscreen && self.settings.pauseInFullscreen
-                
+
                 if shouldPauseForBattery {
                     self.wallpaperEngine.pause(reason: .battery)
                 } else {
                     self.wallpaperEngine.resume(reason: .battery)
                 }
-                
+
                 if shouldPauseForFullscreen {
                     self.wallpaperEngine.pause(reason: .fullscreen)
                 } else {
@@ -83,7 +83,7 @@ final class AppState: ObservableObject {
                 }
             }
             .store(in: &cancellables)
-            
+
         // Observe settings changes to propagate them dynamically.
         settings.objectWillChange
             .receive(on: RunLoop.main)
@@ -102,7 +102,7 @@ final class AppState: ObservableObject {
 
         // Restore the last wallpaper if onboarding is complete.
         if settings.hasCompletedOnboarding {
-            if let activePlaylistIdStr = settings.activePlaylistId, 
+            if let activePlaylistIdStr = settings.activePlaylistId,
                let activePlaylistId = UUID(uuidString: activePlaylistIdStr) {
                 // If a playlist was active, the PlaylistService will fetch it eventually,
                 // but we might need to wait for it. We'll handle playlist restoration in a Task.
@@ -127,12 +127,12 @@ final class AppState: ObservableObject {
         settings.saveLastWallpaper(item)
         settings.clearActivePlaylist()
     }
-    
+
     /// Apply a playlist and persist the choice.
     func applyPlaylist(_ playlist: PlaylistWithItems) {
         wallpaperEngine.applyPlaylist(playlist)
         settings.saveActivePlaylist(id: playlist.playlist.id.uuidString)
-        
+
         do {
             try SharedPaths.ensureDirectoryExists(at: SharedPaths.containerURL)
             let jsonData = try JSONEncoder().encode(playlist)

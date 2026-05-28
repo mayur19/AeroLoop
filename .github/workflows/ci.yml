@@ -13,10 +13,19 @@ concurrency:
 jobs:
   build-test:
     name: build-test
-    runs-on: macos-14
+    runs-on: macos-15
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Select latest stable Xcode
+        # XcodeGen emits the newest project format; pair it with the newest
+        # stable Xcode on the runner so xcodebuild can read it.
+        run: |
+          LATEST=$(ls -d /Applications/Xcode_*.app 2>/dev/null | grep -vi beta | sort -V | tail -1)
+          echo "Selecting $LATEST"
+          sudo xcode-select -s "$LATEST/Contents/Developer"
+          xcodebuild -version
 
       - name: Install tools
         run: brew install xcodegen swiftlint
